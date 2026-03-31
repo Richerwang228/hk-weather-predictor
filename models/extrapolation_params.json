@@ -1,0 +1,108 @@
+{
+  "monthly_rise": {
+    "1": {
+      "mean_rise": 4.32,
+      "std_rise": 1.53,
+      "median_rise": 4.4,
+      "p25_rise": 3.2,
+      "p75_rise": 5.3
+    },
+    "2": {
+      "mean_rise": 4.54,
+      "std_rise": 1.89,
+      "median_rise": 4.4,
+      "p25_rise": 3.0,
+      "p75_rise": 6.0
+    },
+    "3": {
+      "mean_rise": 4.68,
+      "std_rise": 2.05,
+      "median_rise": 4.6,
+      "p25_rise": 2.9,
+      "p75_rise": 6.2
+    },
+    "4": {
+      "mean_rise": 4.68,
+      "std_rise": 1.97,
+      "median_rise": 4.6,
+      "p25_rise": 3.13,
+      "p75_rise": 6.1
+    },
+    "5": {
+      "mean_rise": 4.44,
+      "std_rise": 1.7,
+      "median_rise": 4.3,
+      "p25_rise": 3.2,
+      "p75_rise": 5.7
+    },
+    "6": {
+      "mean_rise": 4.34,
+      "std_rise": 1.32,
+      "median_rise": 4.4,
+      "p25_rise": 3.3,
+      "p75_rise": 5.2
+    },
+    "7": {
+      "mean_rise": 4.82,
+      "std_rise": 1.3,
+      "median_rise": 4.9,
+      "p25_rise": 4.0,
+      "p75_rise": 5.6
+    },
+    "8": {
+      "mean_rise": 4.73,
+      "std_rise": 1.38,
+      "median_rise": 4.8,
+      "p25_rise": 3.8,
+      "p75_rise": 5.6
+    },
+    "9": {
+      "mean_rise": 4.73,
+      "std_rise": 1.28,
+      "median_rise": 4.8,
+      "p25_rise": 3.9,
+      "p75_rise": 5.6
+    },
+    "10": {
+      "mean_rise": 4.52,
+      "std_rise": 1.35,
+      "median_rise": 4.6,
+      "p25_rise": 3.6,
+      "p75_rise": 5.5
+    },
+    "11": {
+      "mean_rise": 4.19,
+      "std_rise": 1.47,
+      "median_rise": 4.2,
+      "p25_rise": 3.2,
+      "p75_rise": 5.2
+    },
+    "12": {
+      "mean_rise": 4.32,
+      "std_rise": 1.44,
+      "median_rise": 4.3,
+      "p25_rise": 3.3,
+      "p75_rise": 5.2
+    }
+  },
+  "transition_probabilities": {
+    "cooling": {
+      "cooling": 0.33320811419984975,
+      "flat": 0.325137982940291,
+      "warming": 0.3670680117149365
+    },
+    "flat": {
+      "cooling": 0.22276483846731782,
+      "flat": 0.3010536879076769,
+      "warming": 0.26000650829808003
+    },
+    "warming": {
+      "cooling": 0.44402704733283244,
+      "flat": 0.3738083291520321,
+      "warming": 0.3729254799869834
+    }
+  },
+  "generated_at": "2026-03-20T20:11:19.055776",
+  "data_range": "2005-01-02 00:00:00 to 2026-02-28 00:00:00",
+  "sample_size": 7728
+}
