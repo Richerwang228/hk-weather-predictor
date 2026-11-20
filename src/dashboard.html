@@ -3,301 +3,182 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>香港天气预测系统</title>
-<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<title>香港最高气温 · 概率预报</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet">
 <style>
-/* ─── Design System (Pro Max) ─── */
-:root {
-  --bg-0: #0a0e1a;
-  --bg-1: #0f172a;
-  --bg-2: #1a2340;
-  --bg-3: #1e2d50;
-  --bg-card: rgba(26,35,64,0.7);
-  --border: rgba(255,255,255,0.06);
-  --border-active: rgba(139,92,246,0.35);
-  --glow: rgba(139,92,246,0.15);
-  --text-0: #f8fafc;
-  --text-1: #cbd5e1;
-  --text-2: #64748b;
-  --gold: #f59e0b;
-  --gold-dim: rgba(245,158,11,0.12);
-  --purple: #8b5cf6;
-  --purple-dim: rgba(139,92,246,0.12);
-  --green: #10b981;
-  --green-dim: rgba(16,185,129,0.12);
-  --red: #ef4444;
-  --red-dim: rgba(239,68,68,0.12);
-  --amber: #f59e0b;
-  --amber-dim: rgba(245,158,11,0.12);
-  --blue: #3b82f6;
-  --blue-dim: rgba(59,130,246,0.12);
-  --radius: 16px;
-  --radius-sm: 10px;
-  --shadow: 0 4px 30px rgba(0,0,0,0.4);
-  --transition: 200ms cubic-bezier(0.4,0,0.2,1);
+:root{
+  --paper:#F3F0E8;
+  --paper-2:#EAE6DB;
+  --card:#FBFAF6;
+  --ink:#1A1C1E;
+  --ink-2:#55585C;
+  --ink-3:#8C8E8F;
+  --rule:#1A1C1E1F;
+  --rule-2:#1A1C1E0F;
+  --hot:#C8431E;
+  --cold:#2F5D8A;
+  --pos:#2E7D4F;
+  --neg:#B0322A;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+  --serif:'Noto Serif SC','Songti SC',serif;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Exo 2',system-ui,-apple-system,sans-serif;background:var(--bg-0);color:var(--text-0);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
-::selection{background:var(--purple);color:white}
+body{font-family:-apple-system,'PingFang SC','Helvetica Neue',sans-serif;background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased;font-size:15px;line-height:1.5}
+.num,.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.shell{max-width:1040px;margin:0 auto;padding:0 32px 64px}
 
-/* ─── Lucide SVG Icons (inline) ─── */
-.icon{width:18px;height:18px;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;fill:none;flex-shrink:0}
-.icon-lg{width:24px;height:24px}
-.icon-sm{width:14px;height:14px}
+/* 报头 */
+.masthead{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;padding:40px 0 18px;border-bottom:2px solid var(--ink)}
+.masthead .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--ink-2);text-transform:uppercase}
+.masthead h1{font-family:var(--serif);font-size:34px;font-weight:700;letter-spacing:.02em;margin-top:6px}
+.masthead .meta{text-align:right;font-family:var(--mono);font-size:12px;color:var(--ink-2);line-height:1.7}
+.subhead{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--rule);font-size:13px;color:var(--ink-2)}
 
-/* ─── Layout ─── */
-.shell{max-width:1120px;margin:0 auto;padding:24px 28px 60px}
-
-/* ─── Header ─── */
-.hero{text-align:center;padding:40px 0 24px;position:relative}
-.hero::after{content:'';position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(139,92,246,0.07),rgba(245,158,11,0.03) 50%,transparent 70%);pointer-events:none}
-.hero h1{font-size:2rem;font-weight:800;color:var(--text-0);position:relative;letter-spacing:-0.5px;display:flex;align-items:center;justify-content:center;gap:12px}
-.hero h1 .gradient{background:linear-gradient(135deg,var(--gold),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero p{color:var(--text-2);font-size:0.82rem;margin-top:8px;position:relative;font-weight:400;letter-spacing:0.3px}
-
-/* ─── Date Picker ─── */
-.date-bar{display:flex;gap:8px;overflow-x:auto;padding:16px 0;scrollbar-width:none;-webkit-overflow-scrolling:touch;justify-content:center;flex-wrap:wrap}
-.date-bar::-webkit-scrollbar{display:none}
-.date-chip{flex-shrink:0;padding:12px 20px;border-radius:var(--radius-sm);background:var(--bg-card);border:1.5px solid var(--border);cursor:pointer;transition:all var(--transition);text-align:center;min-width:135px;backdrop-filter:blur(8px)}
-.date-chip:hover{border-color:var(--border-active);background:var(--bg-3);transform:translateY(-2px);box-shadow:0 4px 20px rgba(139,92,246,0.1)}
-.date-chip.active{border-color:var(--purple);background:var(--purple-dim);box-shadow:0 0 24px var(--glow)}
-.date-chip .day{font-size:0.92rem;font-weight:700;color:var(--text-0)}
-.date-chip .meta{font-size:0.68rem;color:var(--text-2);margin-top:4px;display:flex;align-items:center;gap:5px;justify-content:center}
-.date-chip .conf-tag{font-size:0.6rem;padding:2px 8px;border-radius:6px;font-weight:700;letter-spacing:0.3px}
-.conf-tag.c-高{background:var(--green-dim);color:var(--green)}
-.conf-tag.c-中高{background:var(--blue-dim);color:var(--blue)}
-.conf-tag.c-中{background:var(--amber-dim);color:var(--amber)}
-.conf-tag.c-中低{background:var(--amber-dim);color:var(--amber)}
-.conf-tag.c-低{background:var(--red-dim);color:var(--red)}
-
-/* ─── Loading skeleton ─── */
-.skeleton{background:linear-gradient(90deg,var(--bg-2) 25%,var(--bg-3) 50%,var(--bg-2) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px;height:44px}
-@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-
-/* ─── Run Button ─── */
-.run-row{text-align:center;padding:8px 0 24px}
-.run-btn{display:inline-flex;align-items:center;gap:10px;padding:14px 44px;border:none;border-radius:var(--radius-sm);font-size:1rem;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--purple),#6d28d9);color:white;box-shadow:0 4px 25px rgba(139,92,246,0.3);font-family:inherit;transition:all var(--transition);letter-spacing:0.3px}
-.run-btn:hover{transform:translateY(-2px);box-shadow:0 8px 40px rgba(139,92,246,0.4)}
-.run-btn:active{transform:translateY(0)}
-.run-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;box-shadow:none}
-.run-btn .spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite}
+/* 日期与运行 */
+.controls{display:flex;align-items:stretch;gap:0;margin-top:28px;border:1px solid var(--rule);background:var(--card)}
+.date-bar{display:flex;flex:1;overflow-x:auto}
+.date-chip{flex:1;min-width:150px;padding:14px 18px;cursor:pointer;border-right:1px solid var(--rule);position:relative;transition:background .15s}
+.date-chip:hover{background:var(--paper)}
+.date-chip.active{background:var(--ink);color:var(--paper)}
+.date-chip .day{font-weight:600;font-size:15px}
+.date-chip .meta{font-family:var(--mono);font-size:12px;color:var(--ink-3);margin-top:3px}
+.date-chip.active .meta{color:#ffffff99}
+.skeleton{flex:1;min-width:150px;height:66px;border-right:1px solid var(--rule);background:linear-gradient(90deg,var(--card),var(--paper-2),var(--card));background-size:200% 100%;animation:sh 1.4s infinite}
+@keyframes sh{to{background-position:-200% 0}}
+.run-btn{flex:none;border:none;background:var(--hot);color:#fff;font:600 15px/1 inherit;font-family:inherit;padding:0 30px;cursor:pointer;display:flex;align-items:center;gap:10px;letter-spacing:.04em}
+.run-btn:hover{background:#B13A18}
+.run-btn:disabled{background:var(--ink-3);cursor:not-allowed}
+.run-btn .spin{width:14px;height:14px;border:2px solid #ffffff55;border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ─── Step Log ─── */
-.steps{margin:0 auto;max-width:800px}
-.step{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--border);align-items:flex-start;opacity:0;animation:fadeIn 0.3s ease forwards}
-@keyframes fadeIn{to{opacity:1}}
-.step-icon{width:30px;height:30px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.75rem;font-weight:700}
-.step-icon.done{background:var(--green-dim);color:var(--green)}
-.step-icon.error{background:var(--red-dim);color:var(--red)}
-.step-icon.warn{background:var(--amber-dim);color:var(--amber)}
-.step-icon.skip{background:rgba(255,255,255,0.04);color:var(--text-2)}
-.step-body{flex:1;min-width:0}
-.step-label{font-size:0.88rem;font-weight:600;color:var(--text-0)}
-.step-detail{font-size:0.78rem;color:var(--text-2);margin-top:2px;line-height:1.5}
+/* 运行记录 */
+.steps{margin-top:20px;font-family:var(--mono);font-size:13px}
+.step{display:grid;grid-template-columns:34px 260px 1fr;gap:12px;padding:7px 0;border-bottom:1px dashed var(--rule);opacity:0;animation:in .25s forwards}
+@keyframes in{to{opacity:1}}
+.step .no{color:var(--ink-3)}
+.step .lab{color:var(--ink)}
+.step .det{color:var(--ink-2)}
+.step.error .lab,.step.error .no{color:var(--neg)}
+.step.warn .no{color:var(--hot)}
+.step.skip .lab{color:var(--ink-3)}
 
-/* ─── Results Panel ─── */
-.results{display:none;margin-top:28px}
-.results.show{display:block;animation:slideUp 0.5s ease}
-@keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
-.sec{margin-top:28px}
-.sec-title{font-size:0.95rem;font-weight:700;color:var(--text-0);margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.sec-title svg{color:var(--gold)}
+/* 结果 */
+.results{display:none;margin-top:40px}
+.results.show{display:block;animation:in .4s forwards}
+.sec{margin-top:44px}
+.sec-title{display:flex;align-items:baseline;gap:12px;padding-bottom:8px;border-bottom:1px solid var(--ink);margin-bottom:16px}
+.sec-title h2{font-family:var(--serif);font-size:19px;font-weight:700}
+.sec-title span{font-family:var(--mono);font-size:12px;color:var(--ink-3);letter-spacing:.08em}
 
-/* ─── Summary Cards ─── */
-.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-@media(max-width:700px){.cards{grid-template-columns:1fr 1fr}}
-.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;transition:all var(--transition);backdrop-filter:blur(8px);cursor:default}
-.card:hover{border-color:var(--border-active);box-shadow:0 0 20px var(--glow)}
-.card .lbl{font-size:0.62rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-2);margin-bottom:6px;font-weight:600}
-.card .val{font-size:1.7rem;font-weight:800;color:var(--text-0)}
-.card .sub{font-size:0.72rem;color:var(--text-2);margin-top:4px;font-weight:400}
+.lead{display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:end}
+.lead .big{font-family:var(--mono);font-size:112px;line-height:.9;font-weight:500;letter-spacing:-.04em;color:var(--hot)}
+.lead .big small{font-size:44px;letter-spacing:0;margin-left:4px;color:var(--ink)}
+.lead .cap{margin-top:14px;font-size:15px;color:var(--ink-2)}
+.lead .cap b{color:var(--ink);font-family:var(--mono);font-weight:600}
+.facts{border-top:1px solid var(--rule)}
+.fact{display:flex;justify-content:space-between;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--rule);font-size:14px}
+.fact .k{color:var(--ink-2)}
+.fact .v{font-family:var(--mono);font-weight:500}
+.fact .v em{font-style:normal;color:var(--ink-3);font-weight:400;margin-left:8px;font-size:12px}
+.flag{font-family:var(--mono);font-size:12px;padding:1px 7px;border:1px solid currentColor;border-radius:3px}
 
-/* ─── Big Result Card ─── */
-.result-hero{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-@media(max-width:600px){.result-hero{grid-template-columns:1fr}}
-.result-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:24px 26px;backdrop-filter:blur(8px);transition:all var(--transition)}
-.result-card:hover{border-color:var(--border-active)}
-.result-card .lbl{font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-2);margin-bottom:8px;font-weight:600}
-.result-card .big{font-size:3rem;font-weight:900;letter-spacing:-1.5px}
-.result-card .desc{font-size:0.82rem;color:var(--text-1);margin-top:6px;line-height:1.6;font-weight:400}
-.model-agree{font-size:0.78rem;margin-top:8px;color:var(--text-2);font-weight:500}
+/* 档位分布 */
+.hist{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px;align-items:end;height:240px;padding-top:24px;border-bottom:1px solid var(--ink)}
+.bin{position:relative;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
+.bin .bar{width:100%;background:var(--paper-2);border-top:2px solid var(--ink-3);position:relative}
+.bin.top .bar{background:#C8431E26;border-top-color:var(--hot)}
+.bin .mk{position:absolute;left:-3px;right:-3px;height:0;border-top:2px dashed var(--cold)}
+.bin .p{position:absolute;top:-20px;font-family:var(--mono);font-size:11px;color:var(--ink-2);white-space:nowrap}
+.bin.top .p{color:var(--hot);font-weight:600}
+.axis{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px;font-family:var(--mono);font-size:12px;text-align:center;padding-top:6px;color:var(--ink-2)}
+.legend{display:flex;gap:22px;margin-top:14px;font-size:12px;color:var(--ink-2)}
+.legend i{display:inline-block;width:18px;height:10px;margin-right:6px;vertical-align:-1px}
 
-/* ─── Confidence Meter ─── */
-.conf-meter{height:5px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;margin-top:10px}
-.conf-meter-fill{height:100%;border-radius:3px;transition:width 1s cubic-bezier(0.22,1,0.36,1)}
+/* 表格 */
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.08em;color:var(--ink-3);text-align:right;padding:6px 10px;border-bottom:1px solid var(--ink);text-transform:uppercase}
+th:first-child,td:first-child{text-align:left}
+td{padding:9px 10px;border-bottom:1px solid var(--rule);text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+tr:hover td{background:var(--card)}
+td.pos{color:var(--pos);font-weight:600}td.neg{color:var(--neg)}
+.sig{font-family:inherit;font-size:12px;padding:2px 8px;border-radius:3px}
+.sig-买入{background:var(--pos);color:#fff}
+.sig-观望{border:1px solid var(--hot);color:var(--hot)}
+.sig-跳过{color:var(--ink-3)}
 
-/* ─── Probability Bars ─── */
-.prob-list{display:flex;flex-direction:column;gap:6px}
-.prob-row{display:flex;align-items:center;gap:10px}
-.prob-lbl{width:48px;text-align:right;font-size:0.85rem;font-weight:700;color:var(--text-0);flex-shrink:0}
-.prob-track{flex:1;height:30px;background:rgba(255,255,255,0.03);border-radius:8px;overflow:hidden;position:relative}
-.prob-fill{height:100%;border-radius:8px;transition:width 1s cubic-bezier(0.22,1,0.36,1)}
-.prob-fill.rank-0{background:linear-gradient(90deg,var(--gold),var(--purple))}
-.prob-fill.rank-1{background:linear-gradient(90deg,var(--green),#34d399)}
-.prob-fill.rank-2{background:rgba(255,255,255,0.1)}
-.prob-fill.rank-3{background:rgba(255,255,255,0.05)}
-.prob-pct{width:52px;font-size:0.82rem;font-weight:600;text-align:right;color:var(--text-1);flex-shrink:0}
+/* 交易方案 */
+.plan{border:1px solid var(--rule);background:var(--card)}
+.plan-head{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 18px;border-bottom:1px solid var(--rule);flex-wrap:wrap}
+.plan-head b{font-size:15px}
+.plan-head .urg{font-size:13px;color:var(--hot);font-weight:600}
+.tl{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--rule)}
+.tl>div{padding:12px 18px;border-right:1px solid var(--rule)}
+.tl>div:last-child{border-right:none}
+.tl .k{font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:.08em}
+.tl .v{font-size:14px;margin-top:2px}
+.cap-row{display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid var(--rule);font-size:14px;color:var(--ink-2)}
+.capital-input{width:90px;font-family:var(--mono);font-size:15px;padding:5px 8px;border:1px solid var(--rule);background:#fff;color:var(--ink);outline:none}
+.capital-input:focus{border-color:var(--ink)}
+.capital-summary{margin-left:auto;font-family:var(--mono);font-size:13px}
+.plan table td,.plan table th{padding-left:18px;padding-right:18px}
+.plan-sum{display:grid;grid-template-columns:repeat(3,1fr)}
+.plan-sum>div{padding:14px 18px;border-right:1px solid var(--rule)}
+.plan-sum>div:last-child{border-right:none}
+.plan-sum .k{font-size:12px;color:var(--ink-3)}
+.plan-sum .v{font-family:var(--mono);font-size:22px;font-weight:500;margin-top:2px}
 
-/* ─── Edge Table ─── */
-.edge-grid{display:grid;gap:6px}
-.edge-row{display:grid;grid-template-columns:55px 1fr 1fr 1fr 65px 60px 68px;align-items:center;gap:6px;padding:10px 14px;background:var(--bg-card);border-radius:var(--radius-sm);font-size:0.78rem;backdrop-filter:blur(8px);transition:all var(--transition);border:1px solid transparent}
-.edge-row:hover{border-color:var(--border-active)}
-.edge-row.header{background:transparent;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-2);padding:4px 14px;font-weight:700;border:none}
-.edge-signal{font-weight:700;border-radius:6px;padding:3px 8px;text-align:center;font-size:0.7rem}
-.sig-买入{background:var(--green-dim);color:var(--green)}
-.sig-观望{background:var(--amber-dim);color:var(--amber)}
-.sig-跳过{background:rgba(255,255,255,0.04);color:var(--text-2)}
-.liq-badge{font-size:0.65rem;padding:2px 6px;border-radius:5px;font-weight:700}
-.liq-充足{background:var(--green-dim);color:var(--green)}
-.liq-一般{background:var(--blue-dim);color:var(--blue)}
-.liq-偏低{background:var(--amber-dim);color:var(--amber)}
-.liq-极低{background:var(--red-dim);color:var(--red)}
-
-/* ─── Strategy B Panel ─── */
-.strategy-panel{background:linear-gradient(135deg,rgba(139,92,246,0.06),rgba(245,158,11,0.04));border:1.5px solid var(--border-active);border-radius:var(--radius);padding:26px;backdrop-filter:blur(8px)}
-.strat-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:20px}
-.strat-header h3{font-size:1.05rem;font-weight:700;color:var(--text-0);display:flex;align-items:center;gap:8px}
-.strat-header .urgency{font-size:0.78rem;font-weight:600;padding:5px 14px;border-radius:8px;background:var(--bg-2);border:1px solid var(--border)}
-.capital-row{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap}
-.capital-row label{font-size:0.85rem;color:var(--text-1);font-weight:500}
-.capital-input{background:var(--bg-3);border:1.5px solid var(--border);color:var(--gold);font-size:1rem;font-weight:700;width:110px;padding:10px 14px;border-radius:var(--radius-sm);font-family:inherit;text-align:center;outline:none;transition:all var(--transition)}
-.capital-input:focus{border-color:var(--purple);box-shadow:0 0 20px var(--glow)}
-.capital-summary{font-size:0.78rem;color:var(--text-2);margin-left:auto;font-weight:500}
-
-/* Timeline */
-.timeline{display:flex;align-items:stretch;gap:0;border-radius:var(--radius-sm);overflow:hidden;height:48px;margin-bottom:20px;background:var(--bg-2)}
-.tl-seg{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:0.72rem;font-weight:600;border-right:1px solid var(--border);padding:4px 10px;transition:all var(--transition)}
-.tl-seg:last-child{border-right:none}
-.tl-seg.entry{background:linear-gradient(135deg,rgba(16,185,129,0.12),rgba(16,185,129,0.04));color:var(--green)}
-.tl-seg.hold{background:rgba(255,255,255,0.02);color:var(--text-2)}
-.tl-seg.exit{background:linear-gradient(135deg,rgba(59,130,246,0.12),rgba(59,130,246,0.04));color:var(--blue)}
-.tl-seg .tl-sub{font-size:0.6rem;opacity:0.6;margin-top:2px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-
-/* Recommendation Cards */
-.rec-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:12px}
-.rec-card{background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:18px 20px;transition:all var(--transition);backdrop-filter:blur(8px)}
-.rec-card.buy{border-color:rgba(16,185,129,0.2)}
-.rec-card.buy:hover{border-color:var(--green);box-shadow:0 0 20px rgba(16,185,129,0.1)}
-.rec-card .rec-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.rec-card .bucket-tag{font-size:1.4rem;font-weight:900;color:var(--text-0);letter-spacing:-0.5px}
-.rec-card .edge-tag{font-size:0.78rem;font-weight:700;color:var(--green);background:var(--green-dim);padding:4px 12px;border-radius:8px}
-.rec-details{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.rec-item{display:flex;flex-direction:column;gap:2px}
-.rec-item .k{font-size:0.6rem;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-2);font-weight:700}
-.rec-item .v{font-size:0.9rem;font-weight:600;color:var(--text-0)}
-.rec-item .v.green{color:var(--green)}
-.rec-item .v.red{color:var(--red)}
-.rec-item .v.amber{color:var(--amber)}
-.rec-liq{margin-top:12px;font-size:0.72rem;color:var(--amber);padding:8px 12px;background:var(--amber-dim);border-radius:8px;font-weight:500}
-
-/* Summary Bar */
-.strat-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px;padding-top:18px;border-top:1px solid var(--border)}
-.strat-stat .k{font-size:0.6rem;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-2);font-weight:700}
-.strat-stat .v{font-size:1.4rem;font-weight:800;margin-top:3px;letter-spacing:-0.3px}
-
-/* ─── Hourly Chart ─── */
-.chart-wrap{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;backdrop-filter:blur(8px)}
 .chart-wrap svg{width:100%;height:auto;display:block}
+.note{padding:12px 16px;border-left:3px solid var(--hot);background:var(--card);font-size:14px;color:var(--ink-2)}
+footer{max-width:1040px;margin:0 auto;padding:18px 32px 40px;border-top:1px solid var(--rule);font-size:12px;color:var(--ink-3);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
-/* ─── Footer ─── */
-footer{text-align:center;padding:32px 0 12px;font-size:0.68rem;color:var(--text-2);border-top:1px solid var(--border);margin-top:48px;font-weight:400;letter-spacing:0.2px}
-footer a{color:var(--purple);text-decoration:none}
-
-/* ─── Alerts ─── */
-.alert{padding:14px 18px;border-radius:var(--radius-sm);font-size:0.82rem;font-weight:500;display:flex;align-items:center;gap:10px}
-.alert-warn{background:var(--amber-dim);border:1px solid rgba(245,158,11,0.15);color:var(--amber)}
-.alert-info{background:var(--blue-dim);border:1px solid rgba(59,130,246,0.15);color:var(--blue)}
-.alert-wait{background:var(--amber-dim);border:1px solid rgba(245,158,11,0.15);color:var(--amber)}
-
-/* ─── Responsive ─── */
-@media(max-width:768px){
-  .shell{padding:16px 16px 40px}
-  .hero h1{font-size:1.5rem}
-  .cards{grid-template-columns:1fr 1fr}
-  .edge-row{font-size:0.68rem;gap:3px;padding:8px 10px}
-  .rec-grid{grid-template-columns:1fr}
-  .strat-summary{grid-template-columns:1fr}
-  .result-hero{grid-template-columns:1fr}
+@media(max-width:760px){
+  .shell{padding:0 16px 48px}
+  .masthead{flex-direction:column;align-items:flex-start}.masthead .meta{text-align:left}
+  .controls{flex-direction:column}.run-btn{padding:16px;justify-content:center}
+  .step{grid-template-columns:28px 1fr}.step .det{grid-column:2}
+  .lead{grid-template-columns:1fr;gap:20px}.lead .big{font-size:84px}
+  .tl,.plan-sum{grid-template-columns:1fr}.tl>div,.plan-sum>div{border-right:none;border-bottom:1px solid var(--rule)}
+  .table-wrap{overflow-x:auto}
 }
-@media(max-width:400px){
-  .cards{grid-template-columns:1fr}
-  .date-chip{min-width:110px;padding:10px 14px}
-}
-
-/* ─── Reduced Motion ─── */
-@media(prefers-reduced-motion:reduce){
-  *{animation-duration:0s !important;transition-duration:0s !important}
-}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;opacity:1!important}}
 </style>
 </head>
 <body>
 <div class="shell">
-  <!-- Hero -->
-  <div class="hero">
-    <h1>
-      <svg class="icon icon-lg" viewBox="0 0 24 24"><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41M12 6a6 6 0 100 12 6 6 0 000-12z" stroke="var(--gold)"/></svg>
-      <span class="gradient">香港天气预测系统</span>
-    </h1>
-    <p>多模型集合预报 · 天文台实时修正 · Polymarket 交易信号</p>
+  <header class="masthead">
+    <div>
+      <div class="kicker">HK Daily Max · Ensemble Forecast</div>
+      <h1>香港最高气温 · 概率预报</h1>
+    </div>
+    <div class="meta" id="mastMeta">JMA 35% · ECMWF 30% · GFS 20% · 历史 15%<br>天文台实测 · 卡尔曼修正</div>
+  </header>
+  <div class="subhead"><span>选择日期，运行一次集合预报，再和 Polymarket 档位价格对照。</span><span class="mono" id="nowTime"></span></div>
+
+  <div class="controls">
+    <div class="date-bar" id="dateBar">
+      <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+    </div>
+    <button class="run-btn" id="runBtn" onclick="runAnalysis()" disabled>运行预报</button>
   </div>
 
-  <!-- Date Picker (populated dynamically) -->
-  <div class="date-bar" id="dateBar">
-    <div class="skeleton" style="width:135px"></div>
-    <div class="skeleton" style="width:135px"></div>
-    <div class="skeleton" style="width:135px"></div>
-    <div class="skeleton" style="width:135px"></div>
-  </div>
-
-  <!-- Run Button -->
-  <div class="run-row">
-    <button class="run-btn" id="runBtn" onclick="runAnalysis()" disabled>
-      <svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-      开始分析
-    </button>
-  </div>
-
-  <!-- Step Log -->
   <div class="steps" id="stepLog"></div>
 
-  <!-- Results (hidden until complete) -->
-  <div class="results" id="resultsPanel">
-    <div id="resultsContent"></div>
-  </div>
+  <div class="results" id="resultsPanel"><div id="resultsContent"></div></div>
 </div>
 
 <footer>
-  数据来源：香港天文台 · Open-Meteo（JMA / ECMWF / GFS）· Polymarket<br>
-  所有数据源成本 $0 · 预测仅供参考，不构成投资建议
+  <span>数据：香港天文台 · Open-Meteo（JMA / ECMWF / GFS）· Polymarket</span>
+  <span>预测仅供参考，不构成投资建议</span>
 </footer>
 
 <script>
-/* ─── SVG Icon Library (Lucide subset) ─── */
-const ICONS = {
-  check: '<svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>',
-  x: '<svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
-  alert: '<svg class="icon" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
-  minus: '<svg class="icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg>',
-  chart: '<svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
-  target: '<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
-  compass: '<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>',
-  trending: '<svg class="icon" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
-  thermometer: '<svg class="icon" viewBox="0 0 24 24"><path d="M14 14.76V3.5a2.5 2.5 0 00-5 0v11.26a4.5 4.5 0 105 0z"/></svg>',
-  clock: '<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
-  dollar: '<svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>',
-  shield: '<svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
-  activity: '<svg class="icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
-};
+let selectedDate = null, allDates = [], allMarkets = [], isRunning = false, _lastData = null;
+const pct = (x, d = 1) => (x * 100).toFixed(d) + '%';
+const clean = s => String(s || '').replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}️]/gu, '').trim();
 
-/* ─── State ─── */
-let selectedDate = null;
-let allDates = [];
-let allMarkets = [];
-let isRunning = false;
-let _lastData = null;
+(function clock(){ const t = new Date(); document.getElementById('nowTime').textContent = t.toLocaleString('zh-HK', { hour12:false, month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' }) + ' HKT'; setTimeout(clock, 30000); })();
 
-/* ─── Init ─── */
 (async function init() {
   try {
     const res = await fetch('/api/dates');
@@ -305,27 +186,22 @@ let _lastData = null;
     allDates = data.dates || [];
     allMarkets = data.markets || [];
     renderDateBar();
-  } catch(e) {
-    document.getElementById('dateBar').innerHTML =
-      `<div class="alert alert-warn">${ICONS.alert} 加载日期失败：${e.message}</div>`;
+  } catch (e) {
+    document.getElementById('dateBar').innerHTML = `<div class="note" style="flex:1">加载日期失败：${e.message}</div>`;
   }
 })();
 
 function renderDateBar() {
   const bar = document.getElementById('dateBar');
   if (!allDates.length) {
-    const today = new Date().toISOString().slice(0,10);
-    allDates = [{date:today, label:'今天', confidence:'中', confidence_value:0.5, market_count:0, days_away:0}];
+    const today = new Date().toISOString().slice(0, 10);
+    allDates = [{ date: today, label: '今天', confidence: '中', market_count: 0, days_away: 0 }];
   }
   bar.innerHTML = allDates.map((d, i) => `
-    <div class="date-chip ${i===0?'active':''}" data-date="${d.date}" onclick="selectDate('${d.date}', this)">
+    <div class="date-chip ${i === 0 ? 'active' : ''}" data-date="${d.date}" onclick="selectDate('${d.date}', this)">
       <div class="day">${d.label}</div>
-      <div class="meta">
-        <span class="conf-tag c-${d.confidence}">${d.confidence}</span>
-        ${d.market_count > 0 ? `<span>${d.market_count} 个市场</span>` : '<span>纯预报</span>'}
-      </div>
-    </div>
-  `).join('');
+      <div class="meta">置信 ${d.confidence} · ${d.market_count > 0 ? d.market_count + ' 个档位市场' : '纯预报'}</div>
+    </div>`).join('');
   selectedDate = allDates[0].date;
   document.getElementById('runBtn').disabled = false;
 }
@@ -337,329 +213,188 @@ function selectDate(date, el) {
   el.classList.add('active');
 }
 
-/* ─── Run Analysis ─── */
 async function runAnalysis() {
   if (isRunning || !selectedDate) return;
   isRunning = true;
   const btn = document.getElementById('runBtn');
   btn.disabled = true;
-  btn.innerHTML = '<span class="spin"></span> 分析中...';
-
+  btn.innerHTML = '<span class="spin"></span>运行中';
   const log = document.getElementById('stepLog');
   log.innerHTML = '';
   document.getElementById('resultsPanel').classList.remove('show');
-
   try {
     const res = await fetch(`/api/predict?date=${selectedDate}`);
     const data = await res.json();
-
     const steps = data.steps || [];
     for (let i = 0; i < steps.length; i++) {
-      await new Promise(r => setTimeout(r, 250));
+      await new Promise(r => setTimeout(r, 160));
       const s = steps[i];
-      const iconMap = {done: ICONS.check, error: ICONS.x, warn: ICONS.alert, skip: ICONS.minus};
       const el = document.createElement('div');
-      el.className = 'step';
-      el.innerHTML = `
-        <div class="step-icon ${s.status}">${iconMap[s.status]||'•'}</div>
-        <div class="step-body">
-          <div class="step-label">${s.label}</div>
-          ${s.detail ? `<div class="step-detail">${s.detail}</div>` : ''}
-        </div>
-      `;
+      el.className = 'step ' + (s.status || '');
+      el.innerHTML = `<span class="no">${String(i + 1).padStart(2, '0')}</span><span class="lab">${clean(s.label)}</span><span class="det">${clean(s.detail)}</span>`;
       log.appendChild(el);
     }
-
-    await new Promise(r => setTimeout(r, 300));
+    await new Promise(r => setTimeout(r, 200));
     renderResults(data);
-  } catch(e) {
+  } catch (e) {
     const el = document.createElement('div');
-    el.className = 'step';
-    el.innerHTML = `<div class="step-icon error">${ICONS.x}</div><div class="step-body"><div class="step-label">分析失败</div><div class="step-detail">${e.message}</div></div>`;
+    el.className = 'step error';
+    el.innerHTML = `<span class="no">!!</span><span class="lab">运行失败</span><span class="det">${e.message}</span>`;
     log.appendChild(el);
   }
-
   isRunning = false;
   btn.disabled = false;
-  btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> 开始分析`;
+  btn.textContent = '重新运行';
 }
 
-/* ─── Render Results ─── */
+function title(h, en) { return `<div class="sec-title"><h2>${h}</h2><span>${en}</span></div>`; }
+
 function renderResults(d) {
   _lastData = d;
-  const panel = document.getElementById('resultsPanel');
-  const ct = document.getElementById('resultsContent');
-  let h = '';
-
-  const f = d.forecasts;
+  const f = d.forecasts || {};
   const probs = d.probabilities || {};
   const edges = d.edges || {};
-  const topB = d.top_bucket;
-  const topP = d.top_prob;
   const mc = d.model_consistency || {};
   const strat = d.strategy || {};
+  const topB = d.top_bucket, topP = d.top_prob || 0;
+  let h = '';
 
-  /* ── Hero Cards ── */
-  h += `<div class="sec">
-    <div class="sec-title">${ICONS.chart} 预报数据总览</div>
-    <div class="cards">
-      ${modelCard('JMA 日本', f.jma ? f.jma.max+'°C' : '—', '权重 35%')}
-      ${modelCard('ECMWF 欧洲', f.ecmwf ? f.ecmwf.max+'°C' : '—', '权重 30%')}
-      ${modelCard('GFS 美国', f.gfs ? f.gfs.mean+'°C' : '—', f.gfs ? `±${f.gfs.std} · ${f.gfs.members}成员` : '权重 20%')}
-      ${modelCard('HKO 实测', d.hko && d.hko.hko_temp!=null ? d.hko.hko_temp+'°C' : '—', d.hko ? `湿度 ${d.hko.humidity||'-'}%` : d.is_today ? '暂无数据' : '非今天')}
-    </div>
-  </div>`;
-
-  /* ── Prediction + Confidence ── */
-  const confColors = {'高':'var(--green)','中高':'var(--blue)','中':'var(--amber)','中低':'var(--amber)','低':'var(--red)'};
-  const confColor = confColors[d.confidence_label] || 'var(--text-2)';
-
-  let timeHint = '';
+  let hint = '';
   if (d.is_today && d.current_hour != null) {
-    if (d.current_hour < 8) timeHint = '凌晨模式 · 建议等到 9 点后交易';
-    else if (d.current_hour < 11) timeHint = '最佳窗口 · 有实测但未到峰值';
-    else if (d.current_hour < 14) timeHint = '峰值窗口 · 精度最高';
-    else timeHint = '峰值已过 · 温度基本锁定';
-  } else if (d.days_away === 1) {
-    timeHint = '明天的预测 · 准确度较高';
-  } else if (d.days_away > 1) {
-    timeHint = `${d.days_away} 天后 · 不确定性随距离上升`;
-  }
+    hint = d.current_hour < 8 ? '清晨，模型为主，建议 9 点后再看' : d.current_hour < 11 ? '已有实测，未到峰值' : d.current_hour < 14 ? '接近峰值，实测权重最高' : '峰值已过，基本锁定';
+  } else if (d.days_away === 1) hint = '明天，预报可信度较高';
+  else if (d.days_away > 1) hint = `${d.days_away} 天后，不确定性随距离上升`;
 
-  h += `<div class="sec">
-    <div class="result-hero">
-      <div class="result-card">
-        <div class="lbl">${ICONS.target} 预测结果</div>
-        <div class="big" style="color:var(--gold);text-shadow:0 0 30px rgba(245,158,11,0.2)">${topB}°C</div>
-        <div class="desc">最可能的最高温档位<br>概率 <strong>${(topP*100).toFixed(1)}%</strong></div>
+  const agree = mc.level ? `${mc.level}<em>相差 ${(mc.spread || 0).toFixed(1)}°C</em>` : '—';
+  h += `<div class="sec">${title('预报结论', 'SUMMARY')}
+    <div class="lead">
+      <div>
+        <div class="big">${topB}<small>°C</small></div>
+        <div class="cap">最可能的最高气温档位，概率 <b>${pct(topP)}</b>。${hint}。</div>
       </div>
-      <div class="result-card">
-        <div class="lbl">${ICONS.compass} 预测置信度</div>
-        <div class="big" style="color:${confColor};text-shadow:0 0 25px ${confColor}33">${d.confidence_label}</div>
-        <div class="conf-meter"><div class="conf-meter-fill" style="width:${d.confidence*100}%;background:${confColor}"></div></div>
-        <div class="desc" style="margin-top:10px">
-          ${d.kalman_gain > 0 ? `卡尔曼增益 K = ${d.kalman_gain.toFixed(2)}<br>` : ''}
-          ${timeHint}
-        </div>
-        ${mc.level ? `<div class="model-agree">模型一致性 ${mc.level}（偏差 ${mc.spread?.toFixed(1)||0}°C）
-          <span style="color:${mc.level==='高'?'var(--green)':mc.level==='中'?'var(--amber)':'var(--red)'}">${mc.level==='高'?'● 一致':mc.level==='中'?'● 中等':'● 分歧'}</span>
-        </div>` : ''}
+      <div class="facts">
+        <div class="fact"><span class="k">JMA 日本 · 35%</span><span class="v">${f.jma ? f.jma.max + '°C' : '—'}</span></div>
+        <div class="fact"><span class="k">ECMWF 欧洲 · 30%</span><span class="v">${f.ecmwf ? f.ecmwf.max + '°C' : '—'}</span></div>
+        <div class="fact"><span class="k">GFS 美国 · 20%</span><span class="v">${f.gfs ? f.gfs.mean + '°C' : '—'}${f.gfs ? `<em>±${f.gfs.std} · ${f.gfs.members} 成员</em>` : ''}</span></div>
+        <div class="fact"><span class="k">天文台实测</span><span class="v">${d.hko && d.hko.hko_temp != null ? d.hko.hko_temp + '°C' : '—'}${d.kalman_gain > 0 ? `<em>K = ${d.kalman_gain.toFixed(2)}</em>` : ''}</span></div>
+        <div class="fact"><span class="k">置信度</span><span class="v">${d.confidence_label || '—'}<em>${d.confidence != null ? pct(d.confidence, 0) : ''}</em></span></div>
+        <div class="fact"><span class="k">模型一致性</span><span class="v">${agree}</span></div>
       </div>
-    </div>
+    </div></div>`;
+
+  const market = {};
+  Object.values(edges).forEach(e => { market[e.bucket] = e.market_prob; });
+  const bins = Object.entries(probs).filter(([, p]) => p >= 0.005).map(([b, p]) => [+b, p]).sort((a, b) => a[0] - b[0]);
+  const maxP = Math.max(...bins.map(x => x[1]), ...Object.values(market), 0.01);
+  h += `<div class="sec">${title('各档位概率', 'DISTRIBUTION')}
+    <div class="hist">${bins.map(([b, p]) => `<div class="bin ${b == topB ? 'top' : ''}">
+        <div class="bar" style="height:${(p / maxP) * 92}%"><span class="p" style="left:50%;transform:translateX(-50%)">${pct(p, 0)}</span></div>
+        ${market[b] != null ? `<div class="mk" style="bottom:${(market[b] / maxP) * 92}%"></div>` : ''}
+      </div>`).join('')}</div>
+    <div class="axis">${bins.map(([b]) => `<span>${b}°</span>`).join('')}</div>
+    <div class="legend"><span><i style="background:#C8431E26;border-top:2px solid var(--hot)"></i>模型概率</span>${Object.keys(market).length ? '<span><i style="border-top:2px dashed var(--cold);height:0"></i>Polymarket 价格</span>' : ''}</div>
   </div>`;
 
-  /* ── Probability Distribution ── */
-  const sorted = Object.entries(probs).sort((a,b) => b[1]-a[1]);
-  const maxP = sorted.length ? sorted[0][1] : 1;
-  h += `<div class="sec">
-    <div class="sec-title">${ICONS.chart} 各档位概率分布</div>
-    <div class="prob-list">`;
-  sorted.forEach(([b, p], i) => {
-    if (p < 0.005) return;
-    const w = Math.max(2, (p/maxP)*100);
-    const rank = i === 0 ? 0 : i === 1 ? 1 : i < 4 ? 2 : 3;
-    h += `<div class="prob-row">
-      <div class="prob-lbl">${b}°C</div>
-      <div class="prob-track"><div class="prob-fill rank-${rank}" style="width:${w}%"></div></div>
-      <div class="prob-pct">${(p*100).toFixed(1)}%</div>
-    </div>`;
-  });
-  h += `</div></div>`;
-
-  /* ── Edge Analysis ── */
-  const edgeArr = Object.values(edges).sort((a,b) => b.edge - a.edge);
-  h += `<div class="sec">
-    <div class="sec-title">${ICONS.trending} 交易信号（对比 Polymarket）</div>`;
+  const edgeArr = Object.values(edges).sort((a, b) => b.edge - a.edge);
+  h += `<div class="sec">${title('对照市场价格', 'EDGE vs POLYMARKET')}`;
   if (edgeArr.length) {
-    h += `<div class="edge-grid">
-      <div class="edge-row header">
-        <div>档位</div><div>我的概率</div><div>市场价</div><div>Edge</div><div>流动性</div><div>Kelly</div><div>信号</div>
-      </div>`;
+    h += `<div class="table-wrap"><table><thead><tr><th>档位</th><th>模型概率</th><th>市场价</th><th>差值</th><th>流动性</th><th>Kelly</th><th>信号</th></tr></thead><tbody>`;
     edgeArr.forEach(e => {
-      const edgeCol = e.edge >= 0.08 ? 'var(--green)' : e.edge >= 0 ? 'var(--amber)' : 'var(--red)';
-      const liqLvl = e.liq_level || '—';
-      h += `<div class="edge-row">
-        <div style="font-weight:700">${e.bucket}°C</div>
-        <div>${(e.our_prob*100).toFixed(1)}%</div>
-        <div>${(e.market_prob*100).toFixed(1)}%</div>
-        <div style="color:${edgeCol};font-weight:700">${e.edge>=0?'+':''}${(e.edge*100).toFixed(1)}%</div>
-        <div><span class="liq-badge liq-${liqLvl}">${liqLvl}</span></div>
-        <div>${(e.kelly*100).toFixed(1)}%</div>
-        <div><span class="edge-signal sig-${e.signal}">${e.signal}</span></div>
-      </div>`;
+      h += `<tr><td>${e.bucket}°C</td><td>${pct(e.our_prob)}</td><td>${pct(e.market_prob)}</td>
+        <td class="${e.edge >= 0 ? 'pos' : 'neg'}">${e.edge >= 0 ? '+' : ''}${pct(e.edge)}</td>
+        <td>${e.liq_level || '—'}</td><td>${pct(e.kelly)}</td><td><span class="sig sig-${e.signal}">${e.signal}</span></td></tr>`;
     });
-    h += `</div>`;
+    h += `</tbody></table></div>`;
   } else {
-    h += `<div class="alert alert-info">${ICONS.alert} 该日期暂无对应的 Polymarket 市场。</div>`;
+    h += `<div class="note">这一天暂时没有对应的 Polymarket 市场。</div>`;
   }
   h += `</div>`;
 
-  /* ── Strategy B Panel ── */
   const recs = strat.recommendations || [];
-  if (recs.length > 0) {
-    h += `<div class="sec">
-      <div class="sec-title">${ICONS.shield} 策略 B · 波段交易方案</div>
-      <div class="strategy-panel">
-        <div class="strat-header">
-          <h3>${ICONS.activity} 交易计划</h3>
-          <span class="urgency">${strat.urgency || ''}</span>
+  if (recs.length) {
+    h += `<div class="sec">${title('波段交易方案', 'STRATEGY B')}
+      <div class="plan">
+        <div class="plan-head"><b>交易计划</b><span class="urg">${clean(strat.urgency)}</span></div>
+        <div class="tl">
+          <div><div class="k">入场</div><div class="v">${strat.entry_window || '—'}</div></div>
+          <div><div class="k">持仓</div><div class="v">等待天文台实测</div></div>
+          <div><div class="k">出场</div><div class="v">${strat.exit_window || '—'}</div></div>
         </div>
-
-        <div class="timeline">
-          <div class="tl-seg entry">
-            <div>入场</div>
-            <div class="tl-sub">${strat.entry_window || '—'}</div>
-          </div>
-          <div class="tl-seg hold">
-            <div>持仓</div>
-            <div class="tl-sub">等待实测数据</div>
-          </div>
-          <div class="tl-seg exit">
-            <div>出场</div>
-            <div class="tl-sub">${strat.exit_window || '—'}</div>
-          </div>
+        <div class="cap-row">本金 $<input type="number" class="capital-input" id="capitalInput" value="${strat.capital || 10}" min="1" max="10000" oninput="recalcPositions()">
+          <span class="capital-summary" id="capitalSummary">投入 $${(strat.total_position || 0).toFixed(2)} / $${strat.capital || 10}</span></div>
+        <div class="table-wrap"><table><thead><tr><th>档位</th><th>模型</th><th>买入价</th><th>仓位</th><th>止盈</th><th>止损</th><th>风报比</th><th>期望</th></tr></thead>
+          <tbody id="recGrid">${recs.map(buildRecRow).join('')}</tbody></table></div>
+        <div class="plan-sum">
+          <div><div class="k">总投入</div><div class="v" id="sumPosition">$${(strat.total_position || 0).toFixed(2)}</div></div>
+          <div><div class="k">最大亏损</div><div class="v" style="color:var(--neg)" id="sumRisk">-$${Math.abs(strat.total_risk || 0).toFixed(2)}</div></div>
+          <div><div class="k">期望收益</div><div class="v" id="sumExpected">${money(strat.total_expected || 0)}</div></div>
         </div>
-
-        <div class="capital-row">
-          <label>${ICONS.dollar} 交易本金：$</label>
-          <input type="number" class="capital-input" id="capitalInput" value="${strat.capital||10}" min="1" max="10000" onchange="recalcPositions()" oninput="recalcPositions()">
-          <span class="capital-summary" id="capitalSummary">总投入 $${strat.total_position?.toFixed(2)||0} / $${strat.capital||10}</span>
-        </div>
-
-        <div class="rec-grid" id="recGrid">`;
-    recs.forEach(r => { h += buildRecCard(r); });
-    h += `</div>
-
-        <div class="strat-summary">
-          <div class="strat-stat"><div class="k">总投入</div><div class="v" style="color:var(--text-0)" id="sumPosition">$${strat.total_position?.toFixed(2)||0}</div></div>
-          <div class="strat-stat"><div class="k">最大亏损</div><div class="v" style="color:var(--red)" id="sumRisk">-$${Math.abs(strat.total_risk||0).toFixed(2)}</div></div>
-          <div class="strat-stat"><div class="k">期望收益</div><div class="v" style="color:var(--green)" id="sumExpected">+$${(strat.total_expected||0).toFixed(2)}</div></div>
-        </div>
-
-        ${!strat.liquidity_ok ? `<div class="alert alert-warn" style="margin-top:16px">
-          ${ICONS.alert} 该日期总流动性 $${strat.total_liquidity||0}，偏低。建议控制仓位。
-        </div>` : ''}
       </div>
+      ${!strat.liquidity_ok ? `<div class="note" style="margin-top:12px">这一天总流动性 $${strat.total_liquidity || 0}，偏低，仓位要控制。</div>` : ''}
     </div>`;
   } else if (edgeArr.some(e => e.signal === '观望')) {
-    h += `<div class="sec">
-      <div class="alert alert-wait">${ICONS.clock} 暂无强买入信号（Edge &lt; 8%），建议观望或等价格回调。</div>
-    </div>`;
+    h += `<div class="sec"><div class="note">没有差值超过 8% 的档位，先观望。</div></div>`;
   }
 
-  /* ── Hourly Chart ── */
   if (f.jma && f.jma.hourly && f.ecmwf && f.ecmwf.hourly) {
-    h += `<div class="sec">
-      <div class="sec-title">${ICONS.thermometer} 逐时温度曲线</div>
-      <div class="chart-wrap">${buildChart(f.jma.hourly, f.ecmwf.hourly, d.hko)}</div>
-    </div>`;
+    h += `<div class="sec">${title('逐时气温', 'HOURLY')}<div class="chart-wrap">${buildChart(f.jma.hourly, f.ecmwf.hourly, d.hko)}</div></div>`;
   }
 
-  ct.innerHTML = h;
-  panel.classList.add('show');
+  document.getElementById('resultsContent').innerHTML = h;
+  document.getElementById('resultsPanel').classList.add('show');
 }
 
-function buildRecCard(r) {
-  const prob = r.our_prob ? (r.our_prob*100).toFixed(0) : '?';
-  return `<div class="rec-card buy">
-    <div class="rec-top">
-      <span class="bucket-tag">${r.bucket}°C</span>
-      <span class="edge-tag">概率 ${prob}% · Edge +${(r.edge*100).toFixed(0)}%</span>
-    </div>
-    <div class="rec-details">
-      <div class="rec-item"><div class="k">AI 概率</div><div class="v green">${prob}%</div></div>
-      <div class="rec-item"><div class="k">市场价</div><div class="v">${(r.entry_price*100).toFixed(0)}¢</div></div>
-      <div class="rec-item"><div class="k">建议仓位</div><div class="v">${r.shares}股 ($${r.position_amt.toFixed(2)})</div></div>
-      <div class="rec-item"><div class="k">Edge</div><div class="v green">+${(r.edge*100).toFixed(0)}%</div></div>
-      <div class="rec-item"><div class="k">止盈</div><div class="v green">${(r.take_profit*100).toFixed(0)}¢ (${r.tp_pct})</div></div>
-      <div class="rec-item"><div class="k">止损</div><div class="v red">${(r.stop_loss*100).toFixed(0)}¢ (${r.sl_pct})</div></div>
-      <div class="rec-item"><div class="k">风报比</div><div class="v">${r.risk_reward}</div></div>
-      <div class="rec-item"><div class="k">期望收益</div><div class="v ${r.expected_profit>=0?'green':'red'}">$${r.expected_profit.toFixed(2)}</div></div>
-    </div>
-    ${r.liq_note ? `<div class="rec-liq">${r.liq_note}</div>` : ''}
-  </div>`;
+function money(v) { return (v >= 0 ? '+$' : '-$') + Math.abs(v).toFixed(2); }
+
+function buildRecRow(r) {
+  return `<tr><td>${r.bucket}°C</td><td>${r.our_prob ? pct(r.our_prob, 0) : '—'}</td><td>${(r.entry_price * 100).toFixed(0)}¢</td>
+    <td>${r.shares} 股 · $${r.position_amt.toFixed(2)}</td><td class="pos">${(r.take_profit * 100).toFixed(0)}¢</td>
+    <td class="neg">${(r.stop_loss * 100).toFixed(0)}¢</td><td>${r.risk_reward}</td><td class="${r.expected_profit >= 0 ? 'pos' : 'neg'}">${money(r.expected_profit)}</td></tr>`;
 }
 
 function recalcPositions() {
   if (!_lastData || !_lastData.strategy) return;
   const cap = parseFloat(document.getElementById('capitalInput').value) || 10;
   const recs = _lastData.strategy.recommendations || [];
-  const origCap = _lastData.strategy.capital || 10;
-  const ratio = cap / origCap;
-
-  let totalPos = 0, totalRisk = 0, totalExp = 0;
-  const grid = document.getElementById('recGrid');
-  if (grid) {
-    let cards = '';
-    recs.forEach(r => {
-      const newR = {...r,
-        position_amt: Math.max(0.5, +(r.position_amt * ratio).toFixed(2)),
-        shares: Math.max(1, Math.round(r.shares * ratio)),
-        max_loss: +(r.max_loss * ratio).toFixed(2),
-        expected_profit: +(r.expected_profit * ratio).toFixed(2),
-      };
-      totalPos += newR.position_amt;
-      totalRisk += newR.max_loss;
-      totalExp += newR.expected_profit;
-      cards += buildRecCard(newR);
-    });
-    grid.innerHTML = cards;
-  }
-  const set = (id, v) => { const e = document.getElementById(id); if(e) e.textContent = v; };
-  set('sumPosition', `$${totalPos.toFixed(2)}`);
-  set('sumRisk', `-$${Math.abs(totalRisk).toFixed(2)}`);
-  set('sumExpected', `+$${totalExp.toFixed(2)}`);
-  set('capitalSummary', `总投入 $${totalPos.toFixed(2)} / $${cap}`);
-}
-
-function modelCard(label, val, sub) {
-  return `<div class="card"><div class="lbl">${label}</div><div class="val">${val}</div><div class="sub">${sub}</div></div>`;
+  const ratio = cap / (_lastData.strategy.capital || 10);
+  let tp = 0, tr = 0, te = 0;
+  const rows = recs.map(r => {
+    const n = { ...r, position_amt: Math.max(0.5, +(r.position_amt * ratio).toFixed(2)), shares: Math.max(1, Math.round(r.shares * ratio)), max_loss: +(r.max_loss * ratio).toFixed(2), expected_profit: +(r.expected_profit * ratio).toFixed(2) };
+    tp += n.position_amt; tr += n.max_loss; te += n.expected_profit;
+    return buildRecRow(n);
+  }).join('');
+  const g = document.getElementById('recGrid'); if (g) g.innerHTML = rows;
+  const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+  set('sumPosition', `$${tp.toFixed(2)}`);
+  set('sumRisk', `-$${Math.abs(tr).toFixed(2)}`);
+  set('sumExpected', money(te));
+  set('capitalSummary', `投入 $${tp.toFixed(2)} / $${cap}`);
 }
 
 function buildChart(jma, ecmwf, hko) {
   const len = Math.min(jma.length, ecmwf.length, 24);
-  const all = [...jma.slice(0,len),...ecmwf.slice(0,len)].filter(v=>v!=null);
+  const all = [...jma.slice(0, len), ...ecmwf.slice(0, len)].filter(v => v != null);
   if (!all.length) return '';
-  const mn = Math.floor(Math.min(...all)) - 1;
-  const mx = Math.ceil(Math.max(...all)) + 1;
-  const rng = mx - mn || 1;
-  const W = len*32, H = 150, PAD=12;
-
-  let s = `<svg viewBox="0 0 ${W} ${H+36}">`;
-  for (let t=mn;t<=mx;t++){
-    const y = PAD + H - ((t-mn)/rng*H);
-    s += `<line x1="30" y1="${y}" x2="${W}" y2="${y}" stroke="rgba(255,255,255,0.04)"/>`;
-    s += `<text x="26" y="${y+3}" font-size="9" fill="#4a5a78" text-anchor="end" font-family="Exo 2">${t}°</text>`;
+  const mn = Math.floor(Math.min(...all)) - 1, mx = Math.ceil(Math.max(...all)) + 1, rng = mx - mn || 1;
+  const W = 960, H = 200, L = 36, T = 16;
+  const px = i => L + (i + .5) * ((W - L) / len), py = v => T + H - ((v - mn) / rng) * H;
+  let s = `<svg viewBox="0 0 ${W} ${H + T + 30}" font-family="IBM Plex Mono, monospace">`;
+  for (let t = mn; t <= mx; t++) {
+    s += `<line x1="${L}" y1="${py(t)}" x2="${W}" y2="${py(t)}" stroke="#1A1C1E" stroke-opacity="${t === mn ? .5 : .08}"/>`;
+    s += `<text x="${L - 8}" y="${py(t) + 4}" font-size="11" fill="#8C8E8F" text-anchor="end">${t}°</text>`;
   }
-  for(let h=0;h<len;h+=3){
-    s += `<text x="${30+h*((W-30)/len)+(W-30)/len/2}" y="${H+PAD+22}" font-size="8" fill="#4a5a78" text-anchor="middle" font-family="Exo 2">${h}:00</text>`;
-  }
-  const px = i => 30 + i*((W-30)/len) + (W-30)/len/2;
-  const py = v => PAD + H - ((v-mn)/rng*H);
-
-  let p1='',p2='';
-  for(let i=0;i<len;i++){
-    if(jma[i]!=null) p1 += (p1?'L':'M')+`${px(i)},${py(jma[i])}`;
-    if(ecmwf[i]!=null) p2 += (p2?'L':'M')+`${px(i)},${py(ecmwf[i])}`;
-  }
-  s += `<path d="${p1}" fill="none" stroke="${getComputedStyle(document.documentElement).getPropertyValue('--gold').trim()}" stroke-width="2.5" opacity="0.9"/>`;
-  s += `<path d="${p2}" fill="none" stroke="${getComputedStyle(document.documentElement).getPropertyValue('--purple').trim()}" stroke-width="2.5" opacity="0.9"/>`;
-
-  if(hko && hko.hko_temp!=null){
+  for (let i = 0; i < len; i += 3) s += `<text x="${px(i)}" y="${T + H + 22}" font-size="11" fill="#8C8E8F" text-anchor="middle">${String(i).padStart(2, '0')}:00</text>`;
+  const path = arr => arr.slice(0, len).map((v, i) => v == null ? '' : `${i ? 'L' : 'M'}${px(i)},${py(v)}`).join('');
+  s += `<path d="${path(jma)}" fill="none" stroke="#C8431E" stroke-width="2"/>`;
+  s += `<path d="${path(ecmwf)}" fill="none" stroke="#2F5D8A" stroke-width="2" stroke-dasharray="5 4"/>`;
+  if (hko && hko.hko_temp != null) {
     const hr = new Date().getHours();
-    if(hr<len){
-      const cx=px(hr), cy=py(hko.hko_temp);
-      s += `<circle cx="${cx}" cy="${cy}" r="5" fill="var(--green)" stroke="white" stroke-width="1.5"/>`;
-      s += `<text x="${cx+9}" y="${cy+4}" font-size="10" fill="var(--green)" font-weight="700" font-family="Exo 2">${hko.hko_temp}° 实测</text>`;
-    }
+    if (hr < len) s += `<circle cx="${px(hr)}" cy="${py(hko.hko_temp)}" r="5" fill="#1A1C1E"/><text x="${px(hr) + 10}" y="${py(hko.hko_temp) + 4}" font-size="12" fill="#1A1C1E">${hko.hko_temp}° 实测</text>`;
   }
-  const lx = W-170;
-  s += `<circle cx="${lx}" cy="10" r="4" fill="var(--gold)"/><text x="${lx+8}" y="13" font-size="9" fill="var(--gold)" font-family="Exo 2">JMA</text>`;
-  s += `<circle cx="${lx+50}" cy="10" r="4" fill="var(--purple)"/><text x="${lx+58}" y="13" font-size="9" fill="var(--purple)" font-family="Exo 2">ECMWF</text>`;
-  s += `<circle cx="${lx+115}" cy="10" r="4" fill="var(--green)"/><text x="${lx+123}" y="13" font-size="9" fill="var(--green)" font-family="Exo 2">实测</text>`;
-
-  s += '</svg>';
-  return s;
+  s += `<g font-size="12"><line x1="${W - 230}" y1="8" x2="${W - 206}" y2="8" stroke="#C8431E" stroke-width="2"/><text x="${W - 200}" y="12" fill="#55585C">JMA</text>
+    <line x1="${W - 150}" y1="8" x2="${W - 126}" y2="8" stroke="#2F5D8A" stroke-width="2" stroke-dasharray="5 4"/><text x="${W - 120}" y="12" fill="#55585C">ECMWF</text>
+    <circle cx="${W - 50}" cy="8" r="4" fill="#1A1C1E"/><text x="${W - 40}" y="12" fill="#55585C">实测</text></g>`;
+  return s + '</svg>';
 }
 </script>
 </body>
